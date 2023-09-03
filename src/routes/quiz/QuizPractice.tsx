@@ -16,7 +16,7 @@ const QuizPractice = () => {
 
   return (
     <Container>
-      <Stack sx={{ height: '100dvh', py: 2 }}>
+      <Stack sx={{ height: '100dvh', py: 2 }} spacing={2}>
         <Stack direction={'row'} alignItems={'center'} spacing={1}>
           <IconButton variant={'outlined'} color={'neutral'}>
             <ArrowLeft />
