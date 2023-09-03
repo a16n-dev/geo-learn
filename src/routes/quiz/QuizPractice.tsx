@@ -2,9 +2,13 @@ import { Box, Button, IconButton, LinearProgress, Stack } from '@mui/joy';
 import { ArrowLeft, CheckCircle2, Menu, XCircle } from 'lucide-react';
 
 import Container from '../../components/layout/Container/Container.tsx';
+import { RouterLink } from '../../components/layout/RouterLink/RouterLink.tsx';
+import useDisableOverscroll from '../../hooks/useDisableOverscroll.tsx';
 import useGameStore from '../../hooks/useGameStore.tsx';
 
 const QuizPractice = () => {
+  useDisableOverscroll();
+
   const {
     question,
     answers,
@@ -18,7 +22,12 @@ const QuizPractice = () => {
     <Container>
       <Stack sx={{ height: '100dvh', py: 2 }} spacing={2}>
         <Stack direction={'row'} alignItems={'center'} spacing={1}>
-          <IconButton variant={'outlined'} color={'neutral'}>
+          <IconButton
+            variant={'outlined'}
+            color={'neutral'}
+            component={RouterLink}
+            to={'..'}
+          >
             <ArrowLeft />
           </IconButton>
           <LinearProgress determinate value={25} />
