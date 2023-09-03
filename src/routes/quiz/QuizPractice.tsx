@@ -73,7 +73,7 @@ const QuizPractice = () => {
               );
             } else if (isCorrect && !isSelected) {
               return (
-                <Button key={id} color={'success'} variant={'soft'}>
+                <Button key={id} size={'lg'} color={'success'} variant={'soft'}>
                   {display}
                 </Button>
               );
