@@ -64,7 +64,6 @@ const QuizPractice = () => {
                 <Button
                   key={id}
                   color={'success'}
-                  variant={'soft'}
                   endDecorator={<CheckCircle2 />}
                   size={'lg'}
                 >
@@ -73,7 +72,7 @@ const QuizPractice = () => {
               );
             } else if (isCorrect && !isSelected) {
               return (
-                <Button key={id} size={'lg'} color={'success'} variant={'soft'}>
+                <Button key={id} size={'lg'} color={'success'}>
                   {display}
                 </Button>
               );
@@ -83,7 +82,6 @@ const QuizPractice = () => {
                   size={'lg'}
                   key={id}
                   color={'danger'}
-                  variant={'soft'}
                   endDecorator={<XCircle />}
                 >
                   {display}
@@ -91,7 +89,7 @@ const QuizPractice = () => {
               );
             } else {
               return (
-                <Button size={'lg'} key={id} variant={'outlined'}>
+                <Button size={'lg'} key={id} disabled>
                   {display}
                 </Button>
               );
