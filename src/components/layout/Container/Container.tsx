@@ -8,6 +8,7 @@ const Container = ({ children, sx, ...rest }: BoxProps) => (
       px: 2,
       display: 'flex',
       flexDirection: 'column',
+      overscrollBehaviour: 'none',
       height: '100dvh',
       overflow: 'auto',
       ...sx,
