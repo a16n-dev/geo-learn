@@ -10,10 +10,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/fira-sans": "^5.0.9",
+    "@mui/joy": "^5.0.0-beta.4",
+    "@supabase/supabase-js": "^2.33.1",
+    "@types/lodash": "^4.14.197",
     "@types/node": "^20.5.7",
+    "localforage": "^1.10.0",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.274.0",
+    "match-sorter": "^6.3.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "ts-node": "^10.9.1"
+    "react-router-dom": "^6.15.0",
+    "sort-by": "^1.2.0",
+    "ts-node": "^10.9.1",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.2",
