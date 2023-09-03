@@ -47,7 +47,7 @@ const QuizPractice = () => {
         {answers.map(({ id, display }) => {
           if (!userAnswer) {
             return (
-              <Button key={id} onClick={() => answerQuestion(id)}>
+              <Button size={'lg'} key={id} onClick={() => answerQuestion(id)}>
                 {display}
               </Button>
             );
@@ -63,6 +63,7 @@ const QuizPractice = () => {
                 color={'success'}
                 variant={'soft'}
                 endDecorator={<CheckCircle2 />}
+                size={'lg'}
               >
                 {display}
               </Button>
@@ -76,6 +77,7 @@ const QuizPractice = () => {
           } else if (!isCorrect && isSelected) {
             return (
               <Button
+                size={'lg'}
                 key={id}
                 color={'danger'}
                 variant={'soft'}
@@ -86,7 +88,7 @@ const QuizPractice = () => {
             );
           } else {
             return (
-              <Button key={id} variant={'outlined'}>
+              <Button size={'lg'} key={id} variant={'outlined'}>
                 {display}
               </Button>
             );
@@ -94,6 +96,7 @@ const QuizPractice = () => {
         })}
       </Stack>
       <Button
+        size={'lg'}
         sx={{ mt: 4 }}
         disabled={!userAnswer}
         onClick={() => nextQuestion()}
