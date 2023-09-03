@@ -19,7 +19,7 @@ export default defineConfig({
         description: 'Geography Trivia',
         start_url: '/',
         background_color: '#FCFDFD',
-        theme_color: '#20A598',
+        theme_color: '#000000',
         orientation: 'any',
         display: 'standalone',
         icons: [

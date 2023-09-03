@@ -6,6 +6,8 @@ const Container = ({ children, sx, ...rest }: BoxProps) => (
       maxWidth: 600,
       mx: 'auto',
       px: 2,
+      pt: 'env(safe-area-inset-top)',
+      pb: 'env(safe-area-inset-bottom)',
       display: 'flex',
       flexDirection: 'column',
       minHeight: '100dvh',
