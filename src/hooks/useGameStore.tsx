@@ -2,66 +2,94 @@ import { sample } from 'lodash';
 import { create } from 'zustand';
 
 import { countries, CountryData } from '../data/countries.ts';
+import { isCorrectQuizAnswer } from '../data/types/helperFns.tsx';
+import { QuizEntry } from '../data/types/Quiz.ts';
+
+interface EntryAttempt {
+  entry: QuizEntry;
+  answer: string;
+  timeToAnswerInMs: number;
+  correct: boolean;
+}
 
 export interface GameStore {
-  question: string;
-  answers: { display: string; id: string }[];
-  correctAnswer: string;
+  entry: QuizEntry;
   userAnswer?: string;
   nextQuestion: () => void;
   answerQuestion: (answer: string) => void;
+  gameHistory: EntryAttempt[];
+  totalQuestions: number;
+  questionStartTimeInMs: number;
 }
 
-const dataset = countries; // .filter((d) => d.unMember);
+const dataset = countries.filter((d) => d.unMember);
 
-const getQuestion = () => sample(dataset) as CountryData;
+const getEntry = (): QuizEntry => {
+  const data = sample(dataset) as CountryData;
 
-const getFakeAnswers = (correctAnswer: string, count: number) => {
-  const answers: CountryData[] = [];
-  while (answers.length < count) {
-    const answer = sample(dataset);
-    if (answer && answer.cca3 !== correctAnswer) {
-      answers.push(answer);
-    }
-  }
-
-  return answers.map((a) => ({
-    display: a.name.common,
-    id: a.cca3,
-  }));
+  return {
+    id: `${data.cca3}`,
+    question: {
+      type: 'image',
+      data: {
+        url: `/content/${data.cca3.toLowerCase()}.svg`,
+        caption: '',
+      },
+    },
+    answer: {
+      type: 'textInput',
+      data: {
+        acceptedAnswers: [data.name.common, data.name.official],
+      },
+    },
+  };
 };
 
-const defaultQuestion = getQuestion();
-
-const useGameStore = create<GameStore>()((set) => ({
-  question: defaultQuestion.cca3,
-  answers: [
-    ...getFakeAnswers(defaultQuestion.cca3, 3),
-    {
-      display: defaultQuestion.name.common,
-      id: defaultQuestion.cca3,
-    },
-  ],
-  correctAnswer: defaultQuestion.cca3,
+const useGameStore = create<GameStore>()((set, get) => ({
+  entry: getEntry(),
+  totalQuestions: 10,
+  gameHistory: [],
+  questionStartTimeInMs: Date.now(),
   nextQuestion: () =>
     set((state) => {
-      const question = getQuestion();
       return {
         ...state,
-        question: question?.cca3,
-        userAnswer: undefined,
-        answers: [
-          ...getFakeAnswers(question.cca3, 3),
-          {
-            display: question.name.common,
-            id: question.cca3,
-          },
-        ],
-        correctAnswer: question.cca3,
+        entry: getEntry(),
       };
     }),
-  answerQuestion: (answer) =>
-    set((state) => ({ ...state, userAnswer: answer })),
+  answerQuestion: (answer) => {
+    set((state) => ({ ...state, userAnswer: answer }));
+
+    const isCorrect = isCorrectQuizAnswer(get().entry.answer, answer);
+
+    const answerTime = Date.now() - get().questionStartTimeInMs;
+
+    const attempt: EntryAttempt = {
+      entry: get().entry,
+      answer,
+      correct: isCorrect,
+      timeToAnswerInMs: answerTime,
+    };
+
+    console.log(attempt);
+
+    // set delay to move to next question in 2s
+    setTimeout(
+      () => {
+        set((state) => {
+          const entry = getEntry();
+          return {
+            ...state,
+            entry,
+            gameHistory: [...get().gameHistory, attempt],
+            questionStartTimeInMs: Date.now(),
+            userAnswer: undefined,
+          };
+        });
+      },
+      isCorrect ? 1000 : 2000,
+    );
+  },
 }));
 
 export default useGameStore;

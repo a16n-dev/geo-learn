@@ -2272,6 +2272,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/color-convert@npm:*":
+  version: 2.0.1
+  resolution: "@types/color-convert@npm:2.0.1"
+  dependencies:
+    "@types/color-name": "*"
+  checksum: 52843d9206661d80957d15330d71f2eb8ebda4aaba72236d2d200e588ac806005a25e25f96393d81c9e61632a8316070d1136d2ff74f0a9350cf6d97291a2550
+  languageName: node
+  linkType: hard
+
+"@types/color-name@npm:*":
+  version: 1.1.1
+  resolution: "@types/color-name@npm:1.1.1"
+  checksum: b71fcad728cc68abcba1d405742134410c8f8eb3c2ef18113b047afca158ad23a4f2c229bcf71a38f4a818dead375c45b20db121d0e69259c2d81e97a740daa6
+  languageName: node
+  linkType: hard
+
+"@types/color@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "@types/color@npm:3.0.4"
+  dependencies:
+    "@types/color-convert": "*"
+  checksum: 46935626ddeb8ae8877488b1f8f2f71b17a529c113673301a1dd7a64d917cb7a748545ac34ed30c188d66a2cd09c33abc24c87bd5b3a80d520cf1f35aaa2e476
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:0.0.39":
   version: 0.0.39
   resolution: "@types/estree@npm:0.0.39"
@@ -4431,6 +4456,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fastest-levenshtein@npm:^1.0.16":
+  version: 1.0.16
+  resolution: "fastest-levenshtein@npm:1.0.16"
+  checksum: a78d44285c9e2ae2c25f3ef0f8a73f332c1247b7ea7fb4a191e6bb51aa6ee1ef0dfb3ed113616dcdc7023e18e35a8db41f61c8d88988e877cf510df8edafbc71
+  languageName: node
+  linkType: hard
+
 "fastq@npm:^1.6.0":
   version: 1.15.0
   resolution: "fastq@npm:1.15.0"
@@ -4653,6 +4685,7 @@ __metadata:
     "@fontsource/fira-sans": ^5.0.9
     "@mui/joy": ^5.0.0-beta.4
     "@supabase/supabase-js": ^2.33.1
+    "@types/color": ^3.0.4
     "@types/jsdom": ^21.1.2
     "@types/lodash": ^4.14.197
     "@types/node": ^20.5.7
@@ -4662,10 +4695,12 @@ __metadata:
     "@typescript-eslint/parser": ^6.0.0
     "@vite-pwa/assets-generator": ^0.0.9
     "@vitejs/plugin-react": ^4.0.3
+    color: ^4.2.3
     eslint: ^8.45.0
     eslint-config-easyrent: ^1.0.17
     eslint-plugin-react-hooks: ^4.6.0
     eslint-plugin-react-refresh: ^0.4.3
+    fastest-levenshtein: ^1.0.16
     jsdom: ^22.1.0
     localforage: ^1.10.0
     lodash: ^4.17.21

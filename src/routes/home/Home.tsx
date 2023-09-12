@@ -6,7 +6,7 @@ import { RouterLink } from '../../components/layout/RouterLink/RouterLink.tsx';
 const Home = () => {
   return (
     <Container>
-      <Typography level={'h1'}>{'Geowhiz'}</Typography>
+      <Typography level={'h1'}>{'Quiz'}</Typography>
       <Button component={RouterLink} to={'/quiz/flags-of-the-world'}>
         {'Flags of the World'}
       </Button>
