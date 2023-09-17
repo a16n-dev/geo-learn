@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 
 import Container from '../../components/layout/Container/Container.tsx';
 import { RouterLink } from '../../components/layout/RouterLink/RouterLink.tsx';
-import QuizEntryAttemptDisplay from '../../components/pages/quiz/QuizEntryAttemptDisplay/QuizEntryAttemptDisplay.tsx';
+import QuizEntryAttemptDisplay from '../../components/lib/quiz/QuizEntryAttemptDisplay/QuizEntryAttemptDisplay.tsx';
 import useGameStore from '../../hooks/useGameStore.tsx';
 
 const QuizSummaryBreakdown = () => {

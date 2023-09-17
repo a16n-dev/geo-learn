@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "lint": "eslint geo-learn --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "generate-pwa-assets": "pwa-assets-generator"
+    "generate-pwa-assets": "pwa-assets-generator",
+    "gen-types": "supabase gen types typescript --project-id irimgxmquqfneuffhgoa > src/supabase/database.types.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -28,6 +29,7 @@
     "match-sorter": "^6.3.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-query": "^3.39.3",
     "react-router-dom": "^6.15.0",
     "sort-by": "^1.2.0",
     "ts-node": "^10.9.1",
@@ -47,6 +49,7 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "jsdom": "^22.1.0",
     "prettier": "^3.0.3",
+    "supabase": "^1.93.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
   },

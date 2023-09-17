@@ -26,11 +26,8 @@ export type QuizTextInputAnswer = {
 export type QuizTextMultiChoiceAnswer = {
   type: 'textMultiChoice';
   data: {
-    answers: {
-      id: string;
-      text: string;
-    }[];
-    correctAnswerId: string;
+    id: string;
+    text: string;
   };
 };
 

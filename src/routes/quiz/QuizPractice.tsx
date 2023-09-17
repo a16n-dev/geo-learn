@@ -4,8 +4,8 @@ import { Navigate, useParams } from 'react-router-dom';
 
 import Container from '../../components/layout/Container/Container.tsx';
 import { RouterLink } from '../../components/layout/RouterLink/RouterLink.tsx';
-import QuizAnswerDisplay from '../../components/pages/quiz/QuizAnswerDisplay/QuizAnswerDisplay.tsx';
-import QuizQuestionDisplay from '../../components/pages/quiz/QuizQuestionDisplay/QuizQuestionDisplay.tsx';
+import QuizAnswerDisplay from '../../components/lib/quiz/QuizAnswerDisplay/QuizAnswerDisplay.tsx';
+import QuizQuestionDisplay from '../../components/lib/quiz/QuizQuestionDisplay/QuizQuestionDisplay.tsx';
 import useDisableOverscroll from '../../hooks/useDisableOverscroll.tsx';
 import useGameStore from '../../hooks/useGameStore.tsx';
 

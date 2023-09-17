@@ -19,7 +19,7 @@ const router = createBrowserRouter([
       },
       { path: 'theme', element: <ThemeTest /> },
       {
-        path: 'quiz/:id',
+        path: 'quiz/:slug',
         element: <QuizOverview />,
         children: [
           {
