@@ -1,4 +1,4 @@
-import { IconButton, LinearProgress, Stack } from '@mui/joy';
+import { CircularProgress, IconButton, LinearProgress, Stack } from '@mui/joy';
 import { ArrowLeft, Menu } from 'lucide-react';
 import { Navigate, useParams } from 'react-router-dom';
 
@@ -10,16 +10,19 @@ import useDisableOverscroll from '../../hooks/useDisableOverscroll.tsx';
 import useGameStore from '../../hooks/useGameStore.tsx';
 
 const QuizPractice = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   useDisableOverscroll();
 
-  const { answerQuestion, entry, userAnswer, gameHistory, totalQuestions } =
-    useGameStore((state) => state);
+  const { answerQuestion, entry, userAnswer, state, metadata } = useGameStore(
+    (state) => state,
+  );
 
-  const gameOver = gameHistory.length === totalQuestions;
+  if (!state.inProgress && state.gameHistory.length === 0) {
+    return <Navigate to={`/quiz/${slug}`} />;
+  }
 
-  if (gameOver) {
-    return <Navigate to={`/quiz/${id}/practice-summary`} />;
+  if (!state.inProgress) {
+    return <Navigate to={`/quiz/${slug}/practice-summary`} />;
   }
 
   return (
@@ -36,18 +39,25 @@ const QuizPractice = () => {
           </IconButton>
           <LinearProgress
             determinate
-            value={(gameHistory.length / totalQuestions) * 100}
+            value={(state.gameHistory.length / metadata.totalQuestions) * 100}
           />
           <IconButton variant={'outlined'} color={'neutral'}>
             <Menu />
           </IconButton>
         </Stack>
-        <QuizQuestionDisplay question={entry.question} />
-        <QuizAnswerDisplay
-          answer={entry.answer}
-          userAnswer={userAnswer}
-          setUserAnswer={answerQuestion}
-        />
+        {entry ? (
+          <>
+            <QuizQuestionDisplay question={entry.question} />
+            <QuizAnswerDisplay
+              answer={entry.answer}
+              userAnswer={userAnswer}
+              setUserAnswer={answerQuestion}
+              additionalIncorrectAnswers={entry.additionalIncorrctAnswers}
+            />
+          </>
+        ) : (
+          <CircularProgress />
+        )}
       </Stack>
     </Container>
   );

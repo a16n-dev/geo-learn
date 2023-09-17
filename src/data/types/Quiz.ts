@@ -46,6 +46,10 @@ export type QuizEntry = {
    * The answer for the entry, in any acceptable format
    */
   answer: QuizAnswer;
+  /**
+   * Additional incorrect answers used for some question types
+   */
+  additionalIncorrectAnswers: QuizAnswer[];
 };
 
 export type EntryAttempt = {

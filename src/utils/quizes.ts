@@ -28,7 +28,7 @@ export const createQuizes = async () => {
           id: c.cca3.toLowerCase(),
           text: c.name.common,
         },
-        keys: [`${c.cca3.toLowerCase()}-flag`],
+        key: `${c.cca3.toLowerCase()}-flag`,
         includeAdditionalIncorrectAnswers: 3,
       })),
   );
@@ -57,10 +57,7 @@ export const createQuizes = async () => {
         answer: {
           acceptedAnswers: [c.name.common, c.name.official],
         },
-        keys: [
-          `${c.cca3.toLowerCase()}-flag`,
-          `${c.cca3.toLowerCase()}-flag-written`,
-        ],
+        key: `${c.cca3.toLowerCase()}-flag-written`,
         includeAdditionalIncorrectAnswers: 0,
       })),
   );

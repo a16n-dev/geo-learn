@@ -1,8 +1,8 @@
 import { CssBaseline, CssVarsProvider, GlobalStyles } from '@mui/joy';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Outlet } from 'react-router-dom';
 
 import theme from '../theme/theme.ts';
+import AuthPage from './AuthPage.tsx';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -23,7 +23,7 @@ const RootLayout = () => {
             },
           }}
         />
-        <Outlet />
+        <AuthPage />
       </CssVarsProvider>
     </QueryClientProvider>
   );

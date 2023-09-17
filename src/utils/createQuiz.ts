@@ -10,7 +10,7 @@ type createQuizQuestion<
   answerType: A;
   question: Extract<QuizQuestion, { type: Q }>['data'];
   answer: Extract<QuizAnswer, { type: A }>['data'];
-  keys: string[];
+  key: string;
   includeAdditionalIncorrectAnswers: number;
 };
 
@@ -68,7 +68,7 @@ export const createQuiz = async <
     answer_type: q.answerType,
     question: q.question,
     answer: q.answer,
-    keys: q.keys,
+    knowledge_key: q.key,
     needs_additional_incorrect_count: q.includeAdditionalIncorrectAnswers,
   }));
 

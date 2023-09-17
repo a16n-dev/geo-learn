@@ -8,6 +8,12 @@ export interface QuizAnswerDisplayProps<
    */
   answer: T extends undefined ? QuizAnswer : Extract<QuizAnswer, { type: T }>;
   /**
+   * Information about the correct answer to the question
+   */
+  additionalIncorrectAnswers: T extends undefined
+    ? QuizAnswer[]
+    : Extract<QuizAnswer, { type: T }>[];
+  /**
    * The users answer to the given question
    */
   userAnswer?: string;

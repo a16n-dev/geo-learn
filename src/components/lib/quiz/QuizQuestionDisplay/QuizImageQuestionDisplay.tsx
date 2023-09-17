@@ -6,7 +6,10 @@ const QuizImageQuestionDisplay = ({
   question,
 }: QuizQuestionDisplayProps<'image'>) => {
   return (
-    <Stack>
+    <Stack alignItems={'center'} spacing={1}>
+      <Typography textAlign={'center'} color={'neutral'}>
+        {question.data.caption}
+      </Typography>
       <Box
         component={'img'}
         sx={{
@@ -18,7 +21,6 @@ const QuizImageQuestionDisplay = ({
         alt={question.data.caption}
         src={question.data.url}
       />
-      <Typography>{question.data.caption}</Typography>
     </Stack>
   );
 };

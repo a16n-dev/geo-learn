@@ -11,6 +11,7 @@ const QuizAnswerDisplay = ({
   answer,
   userAnswer,
   setUserAnswer,
+  additionalIncorrectAnswers,
 }: QuizAnswerDisplayProps) => {
   return (
     <Box sx={{ flex: '0 0 0' }}>
@@ -22,6 +23,7 @@ const QuizAnswerDisplay = ({
                 answer={answer}
                 userAnswer={userAnswer}
                 setUserAnswer={setUserAnswer}
+                additionalIncorrectAnswers={additionalIncorrectAnswers as any}
               />
             );
           case 'textMultiChoice':
@@ -30,6 +32,7 @@ const QuizAnswerDisplay = ({
                 answer={answer}
                 userAnswer={userAnswer}
                 setUserAnswer={setUserAnswer}
+                additionalIncorrectAnswers={additionalIncorrectAnswers as any}
               />
             );
         }

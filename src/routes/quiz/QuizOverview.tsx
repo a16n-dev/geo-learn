@@ -11,16 +11,19 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/joy';
-import { Image, TextCursor, LayoutGrid, ArrowLeft } from 'lucide-react';
+import { Image, TextCursor, LayoutGrid, ArrowLeft, Lock } from 'lucide-react';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import Container from '../../components/layout/Container/Container.tsx';
 import { RouterLink } from '../../components/layout/RouterLink/RouterLink.tsx';
 import { QuizAnswer, QuizQuestion } from '../../data/types/Quiz.ts';
 import WithOutlet from '../../hoc/WithOutlet/WithOutlet.tsx';
+import useAuthSession from '../../hooks/useAuthSession.tsx';
+import useGameStore from '../../hooks/useGameStore.tsx';
 import supabase from '../../supabase/supabase.ts';
+import joinQuiz from '../../utils/joinQuiz.ts';
 
 const renderQuestionFormatChip = (type: string) => {
   switch (type as QuizQuestion['type']) {
@@ -65,7 +68,7 @@ const QuizOverview = () => {
 
   const [questionCount, setQuestionCount] = useState('10');
 
-  const { data } = useQuery(
+  const { data: quiz } = useQuery(
     ['quizes', slug],
     async () =>
       (
@@ -78,11 +81,47 @@ const QuizOverview = () => {
     { enabled: !!slug },
   );
 
+  const quizId = quiz?.id;
+
+  const session = useAuthSession();
+  const navigate = useNavigate();
+
+  const startGame = useGameStore((state) => state.startGame);
+
+  const { data: userQuiz } = useQuery(
+    ['userGameStats', quizId],
+    async () =>
+      (
+        await supabase
+          .from('user_quiz_stats')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .eq('quiz_id', quizId!)
+          .maybeSingle()
+      ).data,
+    { enabled: !!quizId },
+  );
+
   if (!slug) {
     return <Navigate to={'/'} replace={true} />;
   }
 
-  if (!data) return <LinearProgress />;
+  if (!quiz) return <LinearProgress />;
+
+  const handleUnlockQuiz = async () => {
+    await joinQuiz(quiz.id, session.user.id);
+  };
+
+  const handleStartGame = async () => {
+    if (!userQuiz) return;
+    await startGame({
+      numQuestions: (quiz.questions[0] as any).count,
+      userQuizId: userQuiz.id,
+      totalQuestions: parseInt(questionCount),
+    });
+
+    navigate('practice');
+  };
 
   return (
     <Container>
@@ -97,9 +136,9 @@ const QuizOverview = () => {
             <ArrowLeft />
           </IconButton>
         </Stack>
-        <Typography level={'h1'}>{data.name}</Typography>
-        <Typography>{data.description}</Typography>
-        <Sheet sx={{ p: 1 }}>
+        <Typography level={'h1'}>{quiz.name}</Typography>
+        <Typography>{quiz.description}</Typography>
+        <Sheet sx={{ p: 2 }}>
           <Stack
             direction={'row'}
             divider={<Divider orientation={'vertical'} />}
@@ -107,39 +146,55 @@ const QuizOverview = () => {
           >
             <Stack spacing={1}>
               <Typography level={'body-sm'}>{'Questions'}</Typography>
-              <Typography>{(data.questions[0] as any).count}</Typography>
+              <Typography>{(quiz.questions[0] as any).count}</Typography>
             </Stack>
             <Stack spacing={1}>
               <Typography level={'body-sm'}>{'Question Type'}</Typography>
               <Stack direction={'row'}>
-                {data.question_formats.map(renderQuestionFormatChip)}
+                {quiz.question_formats.map(renderQuestionFormatChip)}
               </Stack>
             </Stack>
             <Stack spacing={1}>
               <Typography level={'body-sm'}>{'Answer Type'}</Typography>
               <Stack direction={'row'}>
-                {data.answer_formats.map(renderAnswerFormatChip)}
+                {quiz.answer_formats.map(renderAnswerFormatChip)}
               </Stack>
             </Stack>
           </Stack>
         </Sheet>
-        <FormControl>
-          <FormLabel>{'Question Count'}</FormLabel>
-          <ToggleButtonGroup
-            variant={'outlined'}
-            value={questionCount}
-            onChange={(_, newValue) => {
-              setQuestionCount((v) => (newValue ? newValue : v));
-            }}
-          >
-            <Button value={'10'}>{'10'}</Button>
-            <Button value={'25'}>{'25'}</Button>
-            <Button value={'50'}>{'50'}</Button>
-          </ToggleButtonGroup>
-        </FormControl>
-        <Button component={RouterLink} to={'practice'}>
-          {'Start Quiz'}
-        </Button>
+        {userQuiz ? (
+          <>
+            {' '}
+            <FormControl>
+              <FormLabel>{'Question Count'}</FormLabel>
+              <ToggleButtonGroup
+                variant={'outlined'}
+                value={questionCount}
+                onChange={(_, newValue) => {
+                  setQuestionCount((v) => (newValue ? newValue : v));
+                }}
+              >
+                <Button value={'10'}>{'10'}</Button>
+                <Button value={'25'}>{'25'}</Button>
+                <Button value={'50'}>{'50'}</Button>
+              </ToggleButtonGroup>
+            </FormControl>
+            <Button onClick={handleStartGame}>{'Start Quiz'}</Button>
+          </>
+        ) : (
+          <>
+            <Sheet variant={'soft'} sx={{ p: 2 }}>
+              <Stack spacing={2}>
+                <Typography>
+                  {"You haven't started learning this quiz yet"}
+                </Typography>
+                <Button startDecorator={<Lock />} onClick={handleUnlockQuiz}>
+                  {'Unlock Quiz'}
+                </Button>
+              </Stack>
+            </Sheet>
+          </>
+        )}
       </Stack>
     </Container>
   );

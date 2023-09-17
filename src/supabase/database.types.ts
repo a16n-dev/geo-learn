@@ -15,7 +15,7 @@ export interface Database {
           answer_type: string
           created_at: string
           id: string
-          keys: string[]
+          knowledge_key: string
           needs_additional_incorrect_count: number
           question: Json
           question_type: string
@@ -26,7 +26,7 @@ export interface Database {
           answer_type: string
           created_at?: string
           id: string
-          keys: string[]
+          knowledge_key: string
           needs_additional_incorrect_count?: number
           question: Json
           question_type: string
@@ -37,7 +37,7 @@ export interface Database {
           answer_type?: string
           created_at?: string
           id?: string
-          keys?: string[]
+          knowledge_key?: string
           needs_additional_incorrect_count?: number
           question?: Json
           question_type?: string
@@ -82,7 +82,7 @@ export interface Database {
         }
         Relationships: []
       }
-      user_key_scores: {
+      user_knowledge_keys: {
         Row: {
           created_at: string
           ease_factor: number
@@ -92,7 +92,7 @@ export interface Database {
           next_review_date: string
           repetition_number: number
           score: number
-          user_id: number
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -102,8 +102,8 @@ export interface Database {
           last_review_date?: string
           next_review_date?: string
           repetition_number?: number
-          score: number
-          user_id: number
+          score?: number
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -114,47 +114,83 @@ export interface Database {
           next_review_date?: string
           repetition_number?: number
           score?: number
-          user_id?: number
+          user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_key_scores_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
       }
       user_question_scores: {
         Row: {
           attempts: number
           created_at: string
-          id: number
-          keys: string[]
-          score: number
-          user_id: number
+          knowledge_key: string
+          question_id: string
+          user_id: string
+          user_quiz_id: number
         }
         Insert: {
           attempts?: number
           created_at?: string
-          id?: number
-          keys: string[]
-          score: number
-          user_id: number
+          knowledge_key: string
+          question_id: string
+          user_id: string
+          user_quiz_id: number
         }
         Update: {
           attempts?: number
           created_at?: string
-          id?: number
-          keys?: string[]
-          score?: number
-          user_id?: number
+          knowledge_key?: string
+          question_id?: string
+          user_id?: string
+          user_quiz_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "user_question_scores_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
+            foreignKeyName: "user_question_scores_knowledge_key_fkey"
+            columns: ["knowledge_key"]
+            referencedRelation: "user_knowledge_keys"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "user_question_scores_question_id_fkey"
+            columns: ["question_id"]
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_question_scores_user_quiz_id_fkey"
+            columns: ["user_quiz_id"]
+            referencedRelation: "user_quiz_stats"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      user_quiz_stats: {
+        Row: {
+          created_at: string
+          id: number
+          quiz_id: number
+          score: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          quiz_id: number
+          score?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          quiz_id?: number
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_quiz_stats_quiz_id_fkey"
+            columns: ["quiz_id"]
+            referencedRelation: "quizes"
             referencedColumns: ["id"]
           }
         ]

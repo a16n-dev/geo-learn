@@ -15,7 +15,7 @@ import WithOutlet from '../../hoc/WithOutlet/WithOutlet.tsx';
 import useGameStore from '../../hooks/useGameStore.tsx';
 
 const QuizSummary = () => {
-  const gameHistory = useGameStore((state) => state.gameHistory);
+  const gameHistory = useGameStore((state) => state.state.gameHistory);
 
   return (
     <Container>
