@@ -39,6 +39,10 @@ export type QuizEntry = {
    */
   id: string;
   /**
+   * Knowledge key for the question
+   */
+  knowledgeKey: string;
+  /**
    * The question for the entry, in any acceptable format
    */
   question: QuizQuestion;

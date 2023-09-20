@@ -7,7 +7,7 @@ import QuizEntryAttemptDisplay from '../../components/lib/quiz/QuizEntryAttemptD
 import useGameStore from '../../hooks/useGameStore.tsx';
 
 const QuizSummaryBreakdown = () => {
-  const { gameHistory } = useGameStore((state) => state);
+  const gameHistory = useGameStore((state) => state.state.gameHistory);
 
   return (
     <Container>

@@ -1,8 +1,9 @@
+import { add } from 'date-fns';
 import { random } from 'lodash';
 import { create } from 'zustand';
 
 import { isCorrectQuizAnswer } from '../data/types/helperFns.tsx';
-import { QuizAnswer, QuizEntry } from '../data/types/Quiz.ts';
+import { QuizEntry } from '../data/types/Quiz.ts';
 import supabase from '../supabase/supabase.ts';
 
 interface EntryAttempt {
@@ -13,6 +14,7 @@ interface EntryAttempt {
 }
 
 interface GameMetadata {
+  userId: string;
   userQuizId: number;
   totalQuestions: number;
   numQuestions: number;
@@ -25,23 +27,23 @@ export interface GameStore {
     questionStartTimeInMs: number;
     inProgress: boolean;
   };
+
+  // stores the next 3 preloaded questions -
+  upcomingEntries: QuizEntry[];
   entry: QuizEntry | null;
   userAnswer?: string;
+
   // functions
   answerQuestion: (answer: string) => void;
   startGame: (metadata: GameMetadata) => Promise<void>;
 }
 
-const getRandomNumbers = (
-  length: number,
-  range: [min: number, max: number],
-  blacklist: number[],
-) => {
+const getRandomEntryNumbers = (length: number, chooseFrom: number) => {
   const numbers: number[] = [];
 
   while (numbers.length < length) {
-    const number = random(range[0], range[1], false);
-    if (!blacklist.includes(number)) {
+    const number = random(0, chooseFrom, false);
+    if (!numbers.includes(number)) {
       numbers.push(number);
     }
   }
@@ -50,60 +52,56 @@ const getRandomNumbers = (
 };
 
 const getEntry = async (metadata: GameMetadata): Promise<QuizEntry> => {
-  // const data = sample(dataset) as CountryData;
-
-  const entryNum = random(0, metadata.numQuestions, false);
-
   const { data: userQuestion } = await supabase
     .from('user_question_scores')
-    .select('*, questions(*)')
+    .select('*, questions(*), user_knowledge_keys(*)')
+    .order('knowledge_key.next_review_date', { ascending: true })
     .eq('user_quiz_id', metadata.userQuizId)
-    .range(entryNum, entryNum)
     .single();
 
   if (!userQuestion || !userQuestion.questions) {
     throw new Error('No question found');
   }
 
-  let additionalIncorrect: QuizAnswer[] = [];
+  // get an additional random entry, so that if one collides with the correct answer, it can be omitted
+  const newIds = getRandomEntryNumbers(
+    userQuestion.questions.needs_additional_incorrect_count === 0
+      ? userQuestion.questions.needs_additional_incorrect_count + 1
+      : 0,
+    metadata.numQuestions,
+  );
 
-  if (userQuestion.questions.needs_additional_incorrect_count) {
-    const newIds = getRandomNumbers(
-      userQuestion.questions.needs_additional_incorrect_count,
-      [0, metadata.numQuestions],
-      [entryNum],
-    );
+  // fetch additional incorrect answers
+  const additionalIncorrect = await Promise.all(
+    newIds.map(async (id) => {
+      // get random number, that's different from the current question number
 
-    // fetch additional incorrect answers
-    additionalIncorrect = await Promise.all(
-      Array.from({
-        length: userQuestion.questions.needs_additional_incorrect_count,
-      }).map(async (_, i) => {
-        // get random number, thats different from the current question number
+      const { data: additionalQuestion } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('quiz_id', userQuestion.questions!.quiz_id)
+        .range(id, id)
+        .single();
 
-        const { data: additionalQuestion } = await supabase
-          .from('questions')
-          .select('*')
-          .eq('quiz_id', userQuestion.questions!.quiz_id)
-          .range(newIds[i], newIds[i])
-          .single();
+      if (!additionalQuestion) {
+        throw new Error('No additional question found');
+      }
 
-        if (!additionalQuestion) {
-          throw new Error('No additional question found');
-        }
+      return {
+        id: additionalQuestion.id,
+        type: additionalQuestion.answer_type as any,
+        data: additionalQuestion.answer as any,
+      };
+    }),
+  );
 
-        return {
-          type: additionalQuestion.answer_type as any,
-          data: additionalQuestion.answer as any,
-        };
-      }),
-    );
-  }
-
-  console.log(additionalIncorrect);
+  const additionalIncorrectAnswers = additionalIncorrect
+    .filter((q) => q.id !== userQuestion.question_id)
+    .slice(0, 4);
 
   return {
     id: userQuestion.questions.id,
+    knowledgeKey: userQuestion.questions.knowledge_key,
     question: {
       type: userQuestion.questions.question_type as any,
       data: userQuestion.questions.question as any,
@@ -112,7 +110,7 @@ const getEntry = async (metadata: GameMetadata): Promise<QuizEntry> => {
       type: userQuestion.questions.answer_type as any,
       data: userQuestion.questions.answer as any,
     },
-    additionalIncorrctAnswers: additionalIncorrect,
+    additionalIncorrectAnswers,
   };
 };
 
@@ -128,6 +126,7 @@ const useGameStore = create<GameStore>()((set, get) => ({
     questionStartTimeInMs: Date.now(),
     inProgress: false,
   },
+  upcomingEntries: [],
   entry: null,
 
   answerQuestion: async (answer) => {
@@ -141,6 +140,36 @@ const useGameStore = create<GameStore>()((set, get) => ({
 
     const answerTime = Date.now() - get().state.questionStartTimeInMs;
 
+    // update the spaced repetition data
+    const { data: knowledgeKey } = await supabase
+      .from('user_knowledge_keys')
+      .select()
+      .eq('user_id', get().metadata.userId)
+      .eq('key', entry.knowledgeKey)
+      .single();
+
+    if (!knowledgeKey) {
+      throw new Error('Invalid knowledge key');
+    }
+
+    const newRepetitionNumber = knowledgeKey.repetition_number + 1;
+    const newEaseFactor = knowledgeKey.ease_factor;
+    const newInterval = knowledgeKey.interval;
+    const reviewDate = new Date();
+
+    // update knowledge key
+    await supabase
+      .from('user_knowledge_keys')
+      .update({
+        repetition_number: newRepetitionNumber,
+        ease_factor: newEaseFactor,
+        interval: newInterval,
+        next_review_date: add(reviewDate, { days: newInterval }).toString(),
+        last_review_date: reviewDate.toString(),
+      })
+      .eq('user_id', knowledgeKey.user_id)
+      .eq('key', knowledgeKey.key);
+
     const attempt: EntryAttempt = {
       entry,
       answer,
@@ -148,14 +177,15 @@ const useGameStore = create<GameStore>()((set, get) => ({
       timeToAnswerInMs: answerTime,
     };
 
-    // set delay to move to next question in 2s
+    // set delay to move to next question in 2s if wrong/1s if right
     setTimeout(
       () => {
         void getEntry(get().metadata).then((entry) => {
           set((state) => {
             return {
               ...state,
-              entry,
+              entry: get().upcomingEntries[0],
+              upcomingEntries: [...get().upcomingEntries.slice(1), entry],
               state: {
                 gameHistory: [...get().state.gameHistory, attempt],
                 questionStartTimeInMs: Date.now(),
@@ -173,6 +203,11 @@ const useGameStore = create<GameStore>()((set, get) => ({
   },
   startGame: async (metadata) => {
     const firstEntry = await getEntry(metadata);
+
+    const upcomingEntries = await Promise.all(
+      Array.from({ length: 3 }).map(async () => getEntry(metadata)),
+    );
+
     set((state) => ({
       ...state,
       metadata,
@@ -181,6 +216,7 @@ const useGameStore = create<GameStore>()((set, get) => ({
         questionStartTimeInMs: Date.now(),
         inProgress: true,
       },
+      upcomingEntries: upcomingEntries,
       entry: firstEntry,
       userAnswer: undefined,
     }));

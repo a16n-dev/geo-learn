@@ -52,7 +52,7 @@ const QuizPractice = () => {
               answer={entry.answer}
               userAnswer={userAnswer}
               setUserAnswer={answerQuestion}
-              additionalIncorrectAnswers={entry.additionalIncorrctAnswers}
+              additionalIncorrectAnswers={entry.additionalIncorrectAnswers}
             />
           </>
         ) : (

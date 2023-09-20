@@ -25,7 +25,7 @@ const isCorrectMultichoiceTextAnswer = (
   answer: QuizTextMultiChoiceAnswer,
   userAnswer: string,
 ) => {
-  return userAnswer === answer.data.correctAnswerId;
+  return userAnswer === answer.data.id;
 };
 
 /**
